@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GardenClub.iml" filepath="$PROJECT_DIR$/GardenClub.iml" />
+      <module fileurl="file://C:\Users\Joe\Documents\GitHub\gardenclub-android-2\GardenClub.iml" filepath="C:\Users\Joe\Documents\GitHub\gardenclub-android-2\GardenClub.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gardenclub-android-2.iml" filepath="$PROJECT_DIR$/gardenclub-android-2.iml" />
     </modules>
   </component>
 </project>
