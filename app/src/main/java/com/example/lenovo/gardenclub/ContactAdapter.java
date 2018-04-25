@@ -114,12 +114,12 @@ public class ContactAdapter extends ArrayAdapter implements Filterable {
         contactHolder.tvName.setText(contact.getName());
         contactHolder.tvMbrStatus.setText(contact.getMbrStatus());
         Bitmap image = null;
-        try {
-            image = GetImage(contact.getUserID(), contact.getLoginEmail(), contact.getPhotoID());
-            contactHolder.mImageView.setImageBitmap(image);;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            image = GetImage(contact.getUserID(), contact.getLoginEmail(), contact.getPhotoID());
+//            contactHolder.mImageView.setImageBitmap(image);;
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         return row;
     }
 

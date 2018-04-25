@@ -746,7 +746,7 @@ public class Contact extends AppCompatActivity {
             Thread thread = new Thread(runnable);
             thread.start();
             thread.join();
-            Log.d(TAG, "GetImage: bmp: " + bmp[0]);
+            Bitmap image = bmp[0];
             return bmp[0];
         }
 
