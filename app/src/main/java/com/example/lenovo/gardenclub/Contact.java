@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -30,7 +31,9 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
@@ -49,6 +52,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -232,20 +236,30 @@ public class Contact extends AppCompatActivity {
                                     emailTV.setText(finalEmail);
                                     int p_id = 0;
 
-
-                                    InputStream is = null;
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                                     if (finalPhotoID != null && finalPhotoID != "null") {
                                         try {
-                                            is = getApplicationContext().getAssets().open("pics/p" + finalPhotoID + ".jpg");
-                                        } catch (IOException e) {
+                                            Bitmap image = GetImage(userID, finalEmail, finalPhotoID);
+                                            imageView.setImageBitmap(image);
+
+                                        } catch (InterruptedException e) {
                                             e.printStackTrace();
                                         }
-                                        imageView.setImageBitmap(BitmapFactory.decodeStream(is));
+
+                                        /////////////////////////
+
+//                                        InputStream is = null;
+//
+//
+//                                        try {
+//                                            is = getApplicationContext().getAssets().open("pics/p" + finalPhotoID + ".jpg");
+//                                        } catch (IOException e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                        imageView.setImageBitmap(BitmapFactory.decodeStream(is));
                                     }
-
-
-
+                                    ///////////////////////////////////////////////////////////////////////////////////////////////////
 //                                    Log.d(TAG, "run: photo_id: " + finalPhotoID);
 //                                    String newPID = "p" + finalPhotoID;
 //                                    Log.d(TAG, "run: newPID: " + newPID);
@@ -611,13 +625,8 @@ public class Contact extends AppCompatActivity {
                                     btnEmail.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-
-//                String email = String.valueOf(emailID.getText());
-
                                             Intent emailIntent = new Intent(Intent.ACTION_SEND);
                                             emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{finalEmail});
-//                                            emailIntent.putExtra(Intent.EXTRA_CC, new String[]{"swanandinaction@gmail.com"});
-//                                            emailIntent.putExtra(Intent.EXTRA_BCC, new String[]{"swanandinaction@gmail.com"});
                                             emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject: ");
                                             emailIntent.putExtra(Intent.EXTRA_TEXT, "Body: ");
 
@@ -661,13 +670,6 @@ public class Contact extends AppCompatActivity {
 
         public boolean SaveData(String uID, String email, String fName, String lName, String spouse, String streetAddress, String CAS, String zipCode, String primNum, String secNum) throws InterruptedException {
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-//            final TextView txtUserID = (TextView)findViewById(R.id.txtUserID);
-//            final TextView txtAppointmentID = (TextView)findViewById(R.id.txtAppointmentID);
-//            final EditText txtType = (EditText)findViewById(R.id.txtType);
-//            final EditText txtDate = (EditText)findViewById(R.id.txtDate);
-//            final EditText txtTime = (EditText)findViewById(R.id.txtTime);
-
-
             String url = "http://capefeargardenclub.org/cfgcTestingJSON/update.php";
             params.add(new BasicNameValuePair("userID", uID));
             params.add(new BasicNameValuePair("email", email));
@@ -681,8 +683,7 @@ public class Contact extends AppCompatActivity {
             params.add(new BasicNameValuePair("secNum", secNum));
             params.add(new BasicNameValuePair("bioUpdate", "no"));
 
-
-            String resultServer  = getHttpPost(url,params);
+            String resultServer  = getHttpPost(url,params,"savedata");
 
             /*** Default Value ***/
             String strStatusID = "0";
@@ -713,29 +714,37 @@ public class Contact extends AppCompatActivity {
             return true;
         }
 
-        public String getHttpPost(String strUrl, final List<NameValuePair> params) throws InterruptedException {
-            final String url = strUrl;
+        //post variables to the php
+        //and make the connection, since the other method returns a String
+        //this needs to RETURN A BITMAP
+        public Bitmap GetImage(String uID, String email, String photoID) throws InterruptedException {
+            final List<NameValuePair> params = new ArrayList<NameValuePair>();
+            final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
+            params.add(new BasicNameValuePair("userID", uID));
+            params.add(new BasicNameValuePair("email", email));
+            params.add(new BasicNameValuePair("photoID", photoID));
+            final Bitmap[] bmp = new Bitmap[1];
+//            final String url = strUrl;
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
+                    HttpGet httpRequest = null;
+
+                    //////////////
                     HttpClient client = new DefaultHttpClient();
                     HttpPost httpPost = new HttpPost(url);
                     str = new StringBuilder();
-
                     try {
                         httpPost.setEntity(new UrlEncodedFormEntity(params));
                         //problem starts here
                         HttpResponse response = client.execute(httpPost);
-                        StatusLine statusLine = response.getStatusLine();
+                        StatusLine statusLine = response.getStatusLine();//////
                         int statusCode = statusLine.getStatusCode();
                         if (statusCode == 200) { // Status OK
                             HttpEntity entity = response.getEntity();
-                            InputStream content = entity.getContent();
-                            BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-                            String line;
-                            while ((line = reader.readLine()) != null) {
-                                str.append(line);
-                            }
+                            BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+                            InputStream instream = bufHttpEntity.getContent();
+                            bmp[0] = BitmapFactory.decodeStream(instream);
                         } else {
                             Log.e("Log", "Failed to download result..");
                         }
@@ -743,6 +752,48 @@ public class Contact extends AppCompatActivity {
                         e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
+                    }
+                }
+            };
+            Thread thread = new Thread(runnable);
+            thread.start();
+            thread.join();
+            Log.d(TAG, "GetImage: bmp: " + bmp[0]);
+            return bmp[0];
+        }
+
+        public String getHttpPost(String strUrl, final List<NameValuePair> params, final String purpose) throws InterruptedException {
+            final String url = strUrl;
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (purpose.equals("savedata")) {
+                        HttpClient client = new DefaultHttpClient();
+                        HttpPost httpPost = new HttpPost(url);
+                        str = new StringBuilder();
+
+                        try {
+                            httpPost.setEntity(new UrlEncodedFormEntity(params));
+                            //problem starts here
+                            HttpResponse response = client.execute(httpPost);
+                            StatusLine statusLine = response.getStatusLine();
+                            int statusCode = statusLine.getStatusCode();
+                            if (statusCode == 200) { // Status OK
+                                HttpEntity entity = response.getEntity();
+                                InputStream content = entity.getContent();
+                                BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+                                String line;
+                                while ((line = reader.readLine()) != null) {
+                                    str.append(line);
+                                }
+                            } else {
+                                Log.e("Log", "Failed to download result..");
+                            }
+                        } catch (ClientProtocolException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             };
@@ -764,10 +815,6 @@ public class Contact extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-
-//            TextView textView = findViewById(R.id.textView);
-//            textView.setText(result);
-//            Log.d(TAG, "onPostExecute: s = " + s);
             json_string = result;
             tvBack.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -775,7 +822,6 @@ public class Contact extends AppCompatActivity {
                     onBackPressed();
                 }
             });
-//            writeToFile(json_string);
             JSONObject jsonObject = null;
             try {
                 jsonObject = new JSONObject(String.valueOf(SBString));
