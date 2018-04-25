@@ -5,9 +5,9 @@ package com.example.lenovo.gardenclub;
  */
 
 public class Contacts {
-    private String name, email, mobile, mbrStatus, userID, loginEmail;
+    private String name, email, mobile, mbrStatus, userID, loginEmail, photoID;
 
-    public Contacts (String name, String email, String mobile, String mbrStatus, String userID, String loginEmail) {
+    public Contacts (String name, String email, String mobile, String mbrStatus, String userID, String loginEmail, String photoID) {
         this.setName(name);
         this.setEmail(email);
         this.setMobile(mobile);
@@ -15,6 +15,14 @@ public class Contacts {
         this.setUserID(userID);
         this.setLoginEmail(loginEmail);
 
+    }
+
+    public String getPhotoID() {
+        return photoID;
+    }
+
+    public void setPhotoID(String photoID) {
+        this.photoID = photoID;
     }
 
     public String getLoginEmail() {

@@ -246,18 +246,6 @@ public class Contact extends AppCompatActivity {
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
                                         }
-
-                                        /////////////////////////
-
-//                                        InputStream is = null;
-//
-//
-//                                        try {
-//                                            is = getApplicationContext().getAssets().open("pics/p" + finalPhotoID + ".jpg");
-//                                        } catch (IOException e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                        imageView.setImageBitmap(BitmapFactory.decodeStream(is));
                                     }
                                     ///////////////////////////////////////////////////////////////////////////////////////////////////
 //                                    Log.d(TAG, "run: photo_id: " + finalPhotoID);

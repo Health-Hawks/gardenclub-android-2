@@ -89,7 +89,7 @@ public class ContactList extends AppCompatActivity {
             mJSONObject = new JSONObject(json_string);
             mJSONArray = mJSONObject.getJSONArray("server_response");
             int count = 0;
-            String name, email, mobile, mbrStatus, userID;
+            String name, email, mobile, mbrStatus, userID, photoID;
 
             while(count <= mJSONArray.length()) {
                 JO = mJSONArray.getJSONObject(count);
@@ -98,8 +98,9 @@ public class ContactList extends AppCompatActivity {
                 mobile = JO.getString("PrimNum");
                 mbrStatus = JO.getString("Status");
                 userID = JO.getString("ID");
+                photoID = JO.getString("PhotoID");
 
-                Contacts contact = new Contacts(name, email, mobile, mbrStatus, userID, loginEmail);
+                Contacts contact = new Contacts(name, email, mobile, mbrStatus, userID, loginEmail, photoID);
                 mContactAdapter.add(contact);
 
                 count++;
@@ -108,39 +109,8 @@ public class ContactList extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-//        // Get the intent, verify the action and get the query
-//        Intent searchIntent = getIntent();
-//        if (Intent.ACTION_SEARCH.equals(searchIntent.getAction())) {
-//            String query = searchIntent.getStringExtra(SearchManager.QUERY);
-//            doMySearch(query);
-//        }
         lst.setOnItemClickListener(mContactAdapter.mListener);
-//        lst.setOnItemClickListener(mOnItemClickListener);
     }
-
-
-    //    AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
-//        @Override
-//        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//            try {
-////                    Toast.makeText(getApplicationContext(), String.valueOf(mJSONArray.getJSONObject(i)), Toast.LENGTH_SHORT).show();
-//                Log.d(TAG, "onItemClick: mJSONArray.getJSONObject(i): " + mJSONArray.getJSONObject(i).toString());
-//                String json = mJSONArray.getJSONObject(i).toString();
-//                intent.putExtra("json_object", json);
-//                intent.putExtra("login_email", loginEmail);
-//                /**
-//                 * if (String.valueOf(mJSONArray.getJSONObject(i)).equals(OTHER_USER_ID_LMAO) {
-//                 *      startActivity(otherActivity)
-//                 *      }
-//                 */
-////                startActivity(intent);
-//
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    };
 
 
     public boolean onCreateOptionsMenu(Menu menu) {
