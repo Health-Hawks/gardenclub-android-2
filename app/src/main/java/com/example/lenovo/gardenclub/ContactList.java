@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -74,6 +75,9 @@ public class ContactList extends AppCompatActivity {
         JSONObject JO;
         mContactAdapter = new ContactAdapter(this, R.layout.row_layout_1);
         lst = findViewById(R.id.ListView);
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recView);
+//        recyclerView.setAdapter(mContactAdapter);
 
         lst.setAdapter(mContactAdapter);
         lst.setTextFilterEnabled(true);
