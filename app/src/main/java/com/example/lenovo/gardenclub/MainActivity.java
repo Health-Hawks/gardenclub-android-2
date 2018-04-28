@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
         submit = findViewById(R.id.button);
         UsernameEt = findViewById(R.id.et_login);
         PasswordEt = findViewById(R.id.et_pass);
+        UsernameEt.setText("bakere@uncw.edu");
+        PasswordEt.setText("6!4es2Nl#TCvF!yq)Wjn4#(k");
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                                 Log.d(TAG, "onPageFinished: mJSONArray: " + mJSONArray);
 
                                 Map<String, Bitmap> stringBitmapBitmap;
-                                new ImageGetter().execute(mJSONArray);
+//                                new ImageGetter().execute(mJSONArray);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             } catch (JSONException e) {
@@ -166,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                                 intent.putExtra("login_email", username);
                                 intent.putExtra("password", password);
                                 startActivity(intent);
-                                finish();
+//                                finish();
 
                             } else {
                                 Log.d(TAG, "onPageFinished: json_string == null / jsonParsed = " + jsonParsed);
@@ -178,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                                     Log.d(TAG, "onPageFinished: mJSONArray: " + mJSONArray);
 
                                     Map<String, Bitmap> stringBitmapBitmap;
-                                    new ImageGetter().execute(mJSONArray);
+//                                    new ImageGetter().execute(mJSONArray);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 } catch (JSONException e) {
@@ -241,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "onPageFinished: mJSONArray: " + mJSONArray);
 
             Map<String, Bitmap> stringBitmapBitmap;
-            new ImageGetter().execute(mJSONArray);
+//            new ImageGetter().execute(mJSONArray);
         }
     }
 
