@@ -65,7 +65,6 @@ public class ContactList extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         try {
-
             mJSONObject = new JSONObject(json_string);
             mJSONArray = mJSONObject.getJSONArray("server_response");
             Log.d(TAG, "onCreate: jsonArray: " + mJSONArray);
@@ -86,14 +85,7 @@ public class ContactList extends AppCompatActivity {
                 userID = JO.getString("ID");
                 photoID = JO.getString("PhotoID");
                 Log.d(TAG, "onCreate: photoID: " + photoID);
-
-//                if (photoID != null && photoID != "null") {
-//                    bitmap = new BitMapArrayGod().execute(photoID).get();
-//                    mBitmapMap.put(photoID, bitmap);
-//                }
-
                 Contacts contact = new Contacts(name, email, mobile, mbrStatus, userID, loginEmail, photoID);
-//                mContactAdapter.add(contact);
                 contacts.add(contact);
                 i++;
 
@@ -107,12 +99,7 @@ public class ContactList extends AppCompatActivity {
 
         } catch (JSONException e) {
             e.printStackTrace();
-//        } catch (InterruptedException e) {
-            e.printStackTrace();
-//        } catch (ExecutionException e) {
-            e.printStackTrace();
         }
-//        lst.setOnItemClickListener(mContactAdapter.mListener);
     }
 
 
@@ -176,59 +163,6 @@ public class ContactList extends AppCompatActivity {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-
-
-//            JSONArray currentJA;
-//            JSONObject currentJO;
-//            InputStream inStream = null;
-//            HttpClient client = new DefaultHttpClient();
-//            HttpPost httpPost = new HttpPost(url);
-//            try {
-//                httpPost.setEntity(new UrlEncodedFormEntity(params));
-//                HttpResponse response = client.execute(httpPost);
-//                StatusLine statusLine = response.getStatusLine();//////
-//                int statusCode = statusLine.getStatusCode();
-//                Bitmap bmp = null;
-//                if (statusCode == 200) { // Status OK
-//                    try {
-//                        inStream = null;
-//                        BufferedHttpEntity bufHttpEntity = null;
-//
-//                        currentJO = jsonArrays[0].getJSONObject(i);
-//                        String currentPIDJO = currentJO.getString("PhotoID");
-//                        String currentUIDJO = currentJO.getString("ID");
-//                        params.add(new BasicNameValuePair("photoID", currentPIDJO));
-//                        HttpEntity entity = response.getEntity();
-//                        bufHttpEntity = new BufferedHttpEntity(entity);
-//                        inStream = bufHttpEntity.getContent();
-//                        Log.d(TAG, "doInBackground: bmp: " + bmp);
-//                        Log.d(TAG, "doInBackground: currentUIDJO: " + currentUIDJO);
-//                        Log.d(TAG, "doInBackground: currentPIDJO: " + currentPIDJO);
-//                        BitmapFactory.Options options = new BitmapFactory.Options();
-//                        options.inJustDecodeBounds = true;
-//                                int imageHeight = options.outHeight;
-//                                int imageWidth = options.outWidth;
-//                            bmp =  Glide.with(getApplicationContext())
-//                                    .asBitmap()
-//                                    .load(inStream)
-//                                    .into(75,75)
-//                                    .get();
-//                            bmp = futureTarget.get();
-//                                options.inSampleSize = 2;
-//                                Log.d(TAG, "doInBackground: imageHeight: " + imageHeight);
-//                                Log.d(TAG, "doInBackground: imageWidth: " + imageWidth);
-//                                bmp = BitmapFactory.decodeStream(inStream, null, options);
-//                        userPhotoArray.put(currentPIDJO, bmp);
-
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//
-////                            inStream.close();
-//
-//                } else {
-//                    Log.e("Log", "Failed to download result..");
-//                }
             return currentBmp;
         }
     }

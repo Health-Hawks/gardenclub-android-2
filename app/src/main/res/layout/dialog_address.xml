@@ -40,18 +40,38 @@
         android:layout_marginBottom="4dp"/>
 
     <TextView
-        android:id="@+id/candsTitle"
+        android:id="@+id/cityTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="4dp"
         android:layout_marginTop="4dp"
-        android:text="City and State"
+        android:text="City"
         android:textColor="?android:attr/colorForeground"
         android:textSize="16sp"/>
     <EditText
-        android:id="@+id/etCityAndState"
+        android:id="@+id/etCity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="2dp"
+        android:fontFamily="sans-serif"/>
+
+    <TextView
+        android:id="@+id/stateTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="4dp"
+        android:text="State"
+        android:textColor="?android:attr/colorForeground"
+        android:textSize="16sp"/>
+    <EditText
+        android:id="@+id/etState"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"

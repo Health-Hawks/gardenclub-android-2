@@ -51,13 +51,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,9 +71,6 @@ public class Contact extends AppCompatActivity {
     Intent backIntent;
 
 
-    public Contact() throws JSONException {
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,7 +86,6 @@ public class Contact extends AppCompatActivity {
         getSupportActionBar().hide();
         tvMoreInfo = findViewById(R.id.tv_more_info);
         tvBack = findViewById(R.id.tv_back);
-
 
         new BackgroundTask1().execute("get_info", userID);
     }
@@ -114,7 +103,6 @@ public class Contact extends AppCompatActivity {
             startActivity(backIntent);
 
     }
-
 
 
     class BackgroundTask1 extends AsyncTask<String, Void, String> {
@@ -158,7 +146,6 @@ public class Contact extends AppCompatActivity {
                     backIntent.putExtra("json_data", String.valueOf(jsonObject));
                     Log.d(TAG, "Contact.java doInBackground: jsonArray: " + jsonArray);
 
-
                     String email;
                     String mbrStatus;
                     String photoID;
@@ -167,7 +154,7 @@ public class Contact extends AppCompatActivity {
                     String lastName;
                     String spouse;
                     String StreetAddress;
-                    String CityState, WorkNum, Officers;
+                    String city, state, WorkNum, Officers, CityState;
                     String ZipCode, PrimaryContactNumber, SecondaryContactNumber;
                     String BiographicalInfo;
 
@@ -200,13 +187,18 @@ public class Contact extends AppCompatActivity {
                             SecondaryContactNumber = jsonArray.getJSONObject(i).getString("SecNum");
                             BiographicalInfo = jsonArray.getJSONObject(i).getString("bioInfo");
 
+                            city = CityState.split(",")[0].trim();
+                            state = CityState.split(",")[1].trim();
+                            Log.d(TAG, "doInBackground: city and state: " + CityState.split(","));
+                            Log.d(TAG, "doInBackground: city: " + city);
+                            Log.d(TAG, "doInBackground: state: " + state);
+
                             final String finalFirstName = firstName;
                             final String finalLastName = lastName;
                             final String finalMbrStatus = mbrStatus;
                             final String finalSpouse = spouse;
-                            final String finalStreetAddress = StreetAddress;
-                            final String finalCityState = CityState;
-                            final String finalZipCode = ZipCode;
+                            final String[] finalStreetAddress = {StreetAddress};
+                            final String[] finalZipCode = {ZipCode};
                             final String finalPrimaryContactNumber = PrimaryContactNumber;
                             final String finalSecondaryContactNumber = SecondaryContactNumber;
                             final String finalEmail = email;
@@ -219,13 +211,15 @@ public class Contact extends AppCompatActivity {
                             btnText = findViewById(R.id.btn_text);
 
                             final String finalPhotoID = photoID;
+                            final String[] finalCity = {city};
+                            final String[] finalState = {state};
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     nameTV.setText(finalFirstName.concat(" " + finalLastName));
                                     mbrStatusTV.setText(finalMbrStatus);
                                     spouseTV.setText(finalSpouse);
-                                    addressTV.setText(finalStreetAddress.concat(",\n" + finalCityState + ", " + " " + finalZipCode));
+                                    addressTV.setText(finalStreetAddress[0].concat("\n" + finalCity[0] + ", " + finalState[0] + " " + finalZipCode[0]));
                                     primaryContactTV.setText(finalPrimaryContactNumber);
                                     secondaryContactTV.setText(finalSecondaryContactNumber);
                                     emailTV.setText(finalEmail);
@@ -299,7 +293,7 @@ public class Contact extends AppCompatActivity {
                                                                 udSpouse = finalSpouse;
                                                             }
                                                             if (udCAS == null) {
-                                                                udCAS = finalCityState;
+                                                                udCAS = finalCity[0].concat(", " + finalState[0]);
                                                             }
                                                             if (udPrim == null) {
                                                                 udPrim = finalPrimaryContactNumber;
@@ -308,7 +302,7 @@ public class Contact extends AppCompatActivity {
                                                                 udSec = finalSecondaryContactNumber;
                                                             }
                                                             if (udZip == null) {
-                                                                udZip = finalZipCode;
+                                                                udZip = finalZipCode[0];
                                                             }
                                                             try {
                                                                 SaveData(userID, loginEmail, udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec);
@@ -330,7 +324,7 @@ public class Contact extends AppCompatActivity {
                                                                 udSpouse = finalSpouse;
                                                             }
                                                             if (udCAS == null) {
-                                                                udCAS = finalCityState;
+                                                                udCAS = finalCity[0].concat(", " + finalState[0]);
                                                             }
                                                             if (udPrim == null) {
                                                                 udPrim = finalPrimaryContactNumber;
@@ -339,7 +333,7 @@ public class Contact extends AppCompatActivity {
                                                                 udSec = finalSecondaryContactNumber;
                                                             }
                                                             if (udZip == null) {
-                                                                udZip = finalZipCode;
+                                                                udZip = finalZipCode[0];
                                                             }
                                                             try {
                                                                 SaveData(userID, loginEmail, udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec);
@@ -361,7 +355,7 @@ public class Contact extends AppCompatActivity {
                                                                 udSpouse = finalSpouse;
                                                             }
                                                             if (udCAS == null) {
-                                                                udCAS = finalCityState;
+                                                                udCAS = finalCity[0].concat(", " + finalState[0]);
                                                             }
                                                             if (udPrim == null) {
                                                                 udPrim = finalPrimaryContactNumber;
@@ -370,15 +364,13 @@ public class Contact extends AppCompatActivity {
                                                                 udSec = finalSecondaryContactNumber;
                                                             }
                                                             if (udZip == null) {
-                                                                udZip = finalZipCode;
+                                                                udZip = finalZipCode[0];
                                                             }
                                                             try {
                                                                 SaveData(userID, loginEmail, udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec);
                                                             } catch (InterruptedException e) {
                                                                 e.printStackTrace();
                                                             }
-
-
                                                         }
 
                                                     }
@@ -398,6 +390,7 @@ public class Contact extends AppCompatActivity {
                                             @Override
                                             public void onClick(View view) {
                                                 Toast.makeText(getApplicationContext(), "Tap the fields you wish to change", Toast.LENGTH_LONG).show();
+
                                             }
                                         });
                                         final AlertDialog finalGenAD = alertDialog;
@@ -422,13 +415,13 @@ public class Contact extends AppCompatActivity {
                                                                 udFN = etFN.getText().toString();
                                                                 udLN = etLN.getText().toString();
                                                                 if (udAddress == null) {
-                                                                    udAddress = finalStreetAddress;
+                                                                    udAddress = finalStreetAddress[0];
                                                                 }
                                                                 if (udSpouse == null) {
                                                                     udSpouse = finalSpouse;
                                                                 }
                                                                 if (udCAS == null) {
-                                                                    udCAS = finalCityState;
+                                                                    udCAS = finalCity[0].concat(", " + finalState[0]);
                                                                 }
                                                                 if (udPrim == null) {
                                                                     udPrim = finalPrimaryContactNumber;
@@ -437,7 +430,7 @@ public class Contact extends AppCompatActivity {
                                                                     udSec = finalSecondaryContactNumber;
                                                                 }
                                                                 if (udZip == null) {
-                                                                    udZip = finalZipCode;
+                                                                    udZip = finalZipCode[0];
                                                                 }
                                                                 try {
                                                                     SaveData(userID, loginEmail, udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec);
@@ -479,17 +472,25 @@ public class Contact extends AppCompatActivity {
                                                     builderAddress = new AlertDialog.Builder(new ContextThemeWrapper(Contact.this, R.style.myDialog));
                                                     View viewAd = getLayoutInflater().inflate(R.layout.dialog_address, null);
                                                     final EditText etStreet = viewAd.findViewById(R.id.etStreet);
-                                                    EditText etCAS = viewAd.findViewById(R.id.etCityAndState);
-                                                    EditText etZip = viewAd.findViewById(R.id.etZip);
-                                                    etStreet.setText(finalStreetAddress);
-                                                    etCAS.setText(finalCityState);
-                                                    etZip.setText(finalZipCode);
+                                                    final EditText etCity = viewAd.findViewById(R.id.etCity);
+                                                    final EditText etState = viewAd.findViewById(R.id.etState);
+                                                    final EditText etZip = viewAd.findViewById(R.id.etZip);
+                                                    etStreet.setText(finalStreetAddress[0]);
+                                                    etCity.setText(finalCity[0]);
+                                                    etState.setText(finalState[0]);
+                                                    etZip.setText(finalZipCode[0]);
 
                                                     builderAddress.setView(viewAd);
                                                     builderAddress.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                                                                 @Override
                                                                 public void onClick(DialogInterface dialogInterface, int i) {
                                                                     udAddress = etStreet.getText().toString();
+                                                                    finalStreetAddress[0] = udAddress;
+                                                                    udCAS = etCity.getText().toString().trim().concat(", " + etState.getText().toString().trim().toUpperCase());
+                                                                    finalCity[0] = etCity.getText().toString().trim();
+                                                                    finalState[0] = etState.getText().toString().trim().toUpperCase();
+                                                                    finalZipCode[0] = etZip.getText().toString();
+                                                                    udZip = etZip.getText().toString().trim();
                                                                     if (udFN == null) {
                                                                         udFN = finalFirstName;
                                                                     }
@@ -499,25 +500,29 @@ public class Contact extends AppCompatActivity {
                                                                     if (udSpouse == null) {
                                                                         udSpouse = finalSpouse;
                                                                     }
-                                                                    if (udCAS == null) {
-                                                                        udCAS = finalCityState;
-                                                                    }
                                                                     if (udPrim == null) {
                                                                         udPrim = finalPrimaryContactNumber;
                                                                     }
                                                                     if (udSec == null) {
                                                                         udSec = finalSecondaryContactNumber;
                                                                     }
-                                                                    if (udZip == null) {
-                                                                        udZip = finalZipCode;
+                                                                    if (finalState[0].length() > 2) {
+                                                                        Toast.makeText(getApplicationContext(), "Information was not saved: state must be two letters long", Toast.LENGTH_LONG).show();
+                                                                        return;
+                                                                    } else {
+                                                                        try {
+                                                                            if (udZip.length() != 5) {
+                                                                                Toast.makeText(getApplicationContext(), "Information was not saved: zip code must be a 5-digit number", Toast.LENGTH_LONG).show();
+                                                                                return;
+                                                                            }
+                                                                            int j = Integer.parseInt(udZip);
+                                                                            addressTV.setText(udAddress.concat("\n" + udCAS + ", " + udZip));
+                                                                            SaveData(userID, loginEmail, udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec);
+                                                                        } catch (InterruptedException e) {
+                                                                            e.printStackTrace();
+                                                                        } catch (NumberFormatException e) {
+                                                                            Toast.makeText(getApplicationContext(), "Information was not saved: zip code must be a number", Toast.LENGTH_LONG).show();                                                                        }
                                                                     }
-                                                                    try {
-                                                                        SaveData(userID, loginEmail, udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec);
-                                                                    } catch (InterruptedException e) {
-                                                                        e.printStackTrace();
-                                                                    }
-                                                                    addressTV.setText(udAddress.concat("\n" + udCAS + ", " + " " + udZip));
-
                                                                 }})
                                                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                                                 @Override
@@ -682,12 +687,12 @@ public class Contact extends AppCompatActivity {
             {
 //                ad.setMessage(strMessage);
 //                ad.show();
-                Toast.makeText(Contact.this, "Edit not successful", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Contact.this, "Error: Information was not successfully saved", Toast.LENGTH_SHORT).show();
                 return false;
             }
             else
             {
-                Toast.makeText(Contact.this, "Edit successful", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Contact.this, "Information successfully saved", Toast.LENGTH_SHORT).show();
             }
             return true;
         }
