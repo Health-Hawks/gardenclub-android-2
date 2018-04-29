@@ -19,29 +19,11 @@ import android.view.MenuItem;
 import android.widget.SearchView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.annotation.GlideModule;
-import com.bumptech.glide.request.FutureTarget;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -61,12 +43,7 @@ public class ContactList extends AppCompatActivity {
     Intent intent;
     Map<String, Bitmap> mBitmapMap;
     public static AppCompatActivity fa;
-
-//    SearchView mSearchView = (SearchView) findViewById(R.id.searchView);
-
     RecyclerView lst;
-//    String[] names = {"A", "B","C","D","E","F"};
-//    Integer[] imgid= {R.drawable.image,R.drawable.img,R.drawable.image,R.drawable.image,R.drawable.img,R.drawable.image};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,20 +52,10 @@ public class ContactList extends AppCompatActivity {
         fa = this;
         setContentView(R.layout.activity_contact_list);
         intent = new Intent(this, Contact.class);
-
-
+        Bitmap bitmap = null;
 
         JSONObject JO;
-//        mContactAdapter = new ContactAdapter(this, R.layout.row_layout_1);
         lst = (RecyclerView) findViewById(R.id.ListView);
-
-
-//        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recView);
-//        recyclerView.setAdapter(mContactAdapter);
-
-//        lst.setAdapter(new ContactAdapter(this, contacts));
-//        lst.setAdapter(mContactAdapter);
-//        lst.setTextFilterEnabled(true);
 
         json_string = getIntent().getExtras().getString("json_data");
         loginEmail = getIntent().getExtras().getString("login_email").trim();
@@ -102,8 +69,6 @@ public class ContactList extends AppCompatActivity {
             mJSONObject = new JSONObject(json_string);
             mJSONArray = mJSONObject.getJSONArray("server_response");
             Log.d(TAG, "onCreate: jsonArray: " + mJSONArray);
-//            Map<String, Bitmap> mBitmapMap = new BitMapArrayGod().execute(mJSONArray).get();
-//            Log.d(TAG, "onCreate: mBitmapMap: " + mBitmapMap);
             int i = 0;
             String name, email, mobile, mbrStatus, userID, photoID;
 
@@ -122,6 +87,11 @@ public class ContactList extends AppCompatActivity {
                 photoID = JO.getString("PhotoID");
                 Log.d(TAG, "onCreate: photoID: " + photoID);
 
+//                if (photoID != null && photoID != "null") {
+//                    bitmap = new BitMapArrayGod().execute(photoID).get();
+//                    mBitmapMap.put(photoID, bitmap);
+//                }
+
                 Contacts contact = new Contacts(name, email, mobile, mbrStatus, userID, loginEmail, photoID);
 //                mContactAdapter.add(contact);
                 contacts.add(contact);
@@ -130,6 +100,7 @@ public class ContactList extends AppCompatActivity {
             }
             Log.d(TAG, "onCreate: contacts: " + contacts);
             Log.d(TAG, "onCreate: while loop finishes");
+            Log.d(TAG, "onCreate: mbitmapMap: " + mBitmapMap);
             lst.setLayoutManager(new LinearLayoutManager(this));
             nContactAdapter = new ContactAdapter(this, contacts);
             lst.setAdapter(nContactAdapter);
@@ -183,85 +154,82 @@ public class ContactList extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    public class BitMapArrayGod extends AsyncTask<JSONArray, Void, Map<String, Bitmap>> {
+    public class BitMapArrayGod extends AsyncTask<String, Void, Bitmap> {
         @Override
-        protected Map<String, Bitmap> doInBackground(JSONArray... jsonArrays) {
+        protected Bitmap doInBackground(String... strings) {
             Log.d(TAG, "ImageGetter doInBackground: starts");
             Map<String, Bitmap> userPhotoArray = new HashMap<String, Bitmap>();
-            final List<NameValuePair> params = new ArrayList<NameValuePair>();
-            final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
-            JSONArray currentJA;
-            JSONObject currentJO;
-            InputStream inStream = null;
+            String photoID = strings[0];
+            Bitmap currentBmp = null;
+            final List<NameValuePair> bitmapArray = new ArrayList<NameValuePair>();
+            Log.d(TAG, "doInBackground: photoID: " + photoID);
+            final String url = "http://capefeargardenclub.org/cfgcTestingJSON/images_Testing/images/" + photoID + ".jpg";
+            try {
+                currentBmp = Glide.with(getApplicationContext())
+                        .asBitmap()
+                        .load(url)
+                        .submit().get();
+                Log.d(TAG, "doInBackground: all good :-)");
 
-            HttpClient client = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost(url);
-//            for (int i = 0; i < jsonArrays[0].length(); i++) {
-//                Log.d(TAG, "doInBackground: i: " + i);
-//                try {
-//                    httpPost.setEntity(new UrlEncodedFormEntity(params));
-//                    HttpResponse response = client.execute(httpPost);
-//                    StatusLine statusLine = response.getStatusLine();//////
-//                    int statusCode = statusLine.getStatusCode();
-//                    Bitmap bmp = null;
-//                    if (statusCode == 200) { // Status OK
-//                        try {
-//                            inStream = null;
-//                            BufferedHttpEntity bufHttpEntity = null;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+
+
+//            JSONArray currentJA;
+//            JSONObject currentJO;
+//            InputStream inStream = null;
+//            HttpClient client = new DefaultHttpClient();
+//            HttpPost httpPost = new HttpPost(url);
+//            try {
+//                httpPost.setEntity(new UrlEncodedFormEntity(params));
+//                HttpResponse response = client.execute(httpPost);
+//                StatusLine statusLine = response.getStatusLine();//////
+//                int statusCode = statusLine.getStatusCode();
+//                Bitmap bmp = null;
+//                if (statusCode == 200) { // Status OK
+//                    try {
+//                        inStream = null;
+//                        BufferedHttpEntity bufHttpEntity = null;
 //
-//                            currentJO = jsonArrays[0].getJSONObject(i);
-//                            String currentPIDJO = currentJO.getString("PhotoID");
-//                            String currentUIDJO = currentJO.getString("ID");
-//                            params.add(new BasicNameValuePair("photoID", currentPIDJO));
-//                            HttpEntity entity = response.getEntity();
-//                            bufHttpEntity = new BufferedHttpEntity(entity);
-//                            inStream = bufHttpEntity.getContent();
-//                            Log.d(TAG, "doInBackground: bmp: " + bmp);
-//                            Log.d(TAG, "doInBackground: currentUIDJO: " + currentUIDJO);
-//                            Log.d(TAG, "doInBackground: currentPIDJO: " + currentPIDJO);
-//                            BitmapFactory.Options options = new BitmapFactory.Options();
-//                            options.inJustDecodeBounds = true;
-////                                int imageHeight = options.outHeight;
-////                                int imageWidth = options.outWidth;
-////                            bmp =  Glide.with(getApplicationContext())
-////                                    .asBitmap()
-////                                    .load(inStream)
-////                                    .into(75,75)
-////                                    .get();
-////                            bmp = futureTarget.get();
-////                                options.inSampleSize = 2;
-////                                Log.d(TAG, "doInBackground: imageHeight: " + imageHeight);
-////                                Log.d(TAG, "doInBackground: imageWidth: " + imageWidth);
-////                                bmp = BitmapFactory.decodeStream(inStream, null, options);
-//                            userPhotoArray.put(currentPIDJO, bmp);
-//
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
+//                        currentJO = jsonArrays[0].getJSONObject(i);
+//                        String currentPIDJO = currentJO.getString("PhotoID");
+//                        String currentUIDJO = currentJO.getString("ID");
+//                        params.add(new BasicNameValuePair("photoID", currentPIDJO));
+//                        HttpEntity entity = response.getEntity();
+//                        bufHttpEntity = new BufferedHttpEntity(entity);
+//                        inStream = bufHttpEntity.getContent();
+//                        Log.d(TAG, "doInBackground: bmp: " + bmp);
+//                        Log.d(TAG, "doInBackground: currentUIDJO: " + currentUIDJO);
+//                        Log.d(TAG, "doInBackground: currentPIDJO: " + currentPIDJO);
+//                        BitmapFactory.Options options = new BitmapFactory.Options();
+//                        options.inJustDecodeBounds = true;
+//                                int imageHeight = options.outHeight;
+//                                int imageWidth = options.outWidth;
+//                            bmp =  Glide.with(getApplicationContext())
+//                                    .asBitmap()
+//                                    .load(inStream)
+//                                    .into(75,75)
+//                                    .get();
+//                            bmp = futureTarget.get();
+//                                options.inSampleSize = 2;
+//                                Log.d(TAG, "doInBackground: imageHeight: " + imageHeight);
+//                                Log.d(TAG, "doInBackground: imageWidth: " + imageWidth);
+//                                bmp = BitmapFactory.decodeStream(inStream, null, options);
+//                        userPhotoArray.put(currentPIDJO, bmp);
+
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
 //
 ////                            inStream.close();
 //
-//                    } else {
-//                        Log.e("Log", "Failed to download result..");
-//                    }
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                } catch (ClientProtocolException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
+//                } else {
+//                    Log.e("Log", "Failed to download result..");
 //                }
-//
-//            }
-            return userPhotoArray;
-        }
-
-        @Override
-        protected void onPostExecute(Map<String, Bitmap> stringBitmapMap) {
-//            Log.d(TAG, "onPostExecute: starts image");
-//            Log.d(TAG, "onPostExecute: image json_string: " + json_string);
-//            Log.d(TAG, "onPostExecute: image username: " + username);
-//            Log.d(TAG, "onPostExecute: image password: " + password);
+            return currentBmp;
         }
     }
 

@@ -24,6 +24,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -112,6 +115,8 @@ public class Contact extends AppCompatActivity {
 
     }
 
+
+
     class BackgroundTask1 extends AsyncTask<String, Void, String> {
         String json_post, json_get, json_url;
         private static final String TAG = "BackgroundTask";
@@ -161,13 +166,9 @@ public class Contact extends AppCompatActivity {
                     String firstName;
                     String lastName;
                     String spouse;
-                    String StreetAddress, Committee, CommitteeTitle, AzaleaGardenTourCommitteesTitle, AzaleaGardenTourCommittees;
+                    String StreetAddress;
                     String CityState, WorkNum, Officers;
-                    String ZipCode, PrimaryContactNumber, SecondaryContactNumber, TypeofPrimaryContactNo, TypeofSecondaryContactNo, Office, OfficerTitle, ExecutiveBdMbrship;
-                    String CurrentCmteAssignment1, CmteAssign1Chair, CmteAssign1CoChair, CurrentCmteAssignment2, CmteAssign2Chair, CmteAssign2CoChair;
-                    String CurrentCmteAssignment3;
-                    String CmteAssign3Chair;
-                    String CmteAssign3CoChair;
+                    String ZipCode, PrimaryContactNumber, SecondaryContactNumber;
                     String BiographicalInfo;
 
                     final TextView nameTV = (TextView) findViewById(R.id.nameTV);
@@ -180,7 +181,7 @@ public class Contact extends AppCompatActivity {
                     final ImageView imageView = findViewById(R.id.imageView2);
                     int isUser = 0;
 
-                    for (int i = 0; i <= jsonArray.length(); i++) {
+                    for (int i = 0; i < jsonArray.length(); i++) {
 //                        Log.d(TAG, "doInBackground: jsonArray ->" + jsonArray.getJSONObject(i));
 
                         if (jsonArray.getJSONObject(i).getString("ID").equals(userID)) {
@@ -197,12 +198,6 @@ public class Contact extends AppCompatActivity {
                             ZipCode = jsonArray.getJSONObject(i).getString("ZipCode");
                             PrimaryContactNumber = jsonArray.getJSONObject(i).getString("PrimNum");
                             SecondaryContactNumber = jsonArray.getJSONObject(i).getString("SecNum");
-                            WorkNum = jsonArray.getJSONObject(i).getString("WorkNum");
-                            Officers = jsonArray.getJSONObject(i).getString("Officers");
-                            Committee = jsonArray.getJSONObject(i).getString("Committee");
-                            CommitteeTitle = jsonArray.getJSONObject(i).getString("CommitteeTitle");
-                            AzaleaGardenTourCommitteesTitle = jsonArray.getJSONObject(i).getString("AzaleaGardenTourCommitteesTitles");
-                            AzaleaGardenTourCommittees = jsonArray.getJSONObject(i).getString("AzaleaGardenTourCommittees");
                             BiographicalInfo = jsonArray.getJSONObject(i).getString("bioInfo");
 
                             final String finalFirstName = firstName;
@@ -239,24 +234,19 @@ public class Contact extends AppCompatActivity {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                                     if (finalPhotoID != null && finalPhotoID != "null") {
-                                        try {
-                                            Bitmap image = GetImage(userID, finalEmail, finalPhotoID);
-                                            imageView.setImageBitmap(image);
+                                        //                                            Bitmap image = GetImage(userID, finalEmail, finalPhotoID);
+//                                            imageView.setImageBitmap(image);
+                                        Glide.with(getApplicationContext())
+                                                .load("http://capefeargardenclub.org/cfgcTestingJSON/images_Testing/images/" + finalPhotoID + ".jpg")
+                                                .apply(RequestOptions.circleCropTransform())
+                                                .into(imageView);
 
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
+                                    } else {
+                                        Glide.with(getApplicationContext())
+                                                .load(R.drawable.carolinayellowjessaminemed1)
+                                                .apply(RequestOptions.circleCropTransform())
+                                                .into(imageView);
                                     }
-                                    ///////////////////////////////////////////////////////////////////////////////////////////////////
-//                                    Log.d(TAG, "run: photo_id: " + finalPhotoID);
-//                                    String newPID = "p" + finalPhotoID;
-//                                    Log.d(TAG, "run: newPID: " + newPID);
-//                                    Resources resources;
-//                                    resources = getResources();
-
-
-//                                    imageView.setImageResource(p_id);
-
 
                                     if (finalEmail.equals(loginEmail)) {
                                         if (nameTV == null || nameTV.getText() == "null") {
@@ -702,9 +692,6 @@ public class Contact extends AppCompatActivity {
             return true;
         }
 
-        //post variables to the php
-        //and make the connection, since the other method returns a String
-        //this needs to RETURN A BITMAP
         public Bitmap GetImage(String uID, String email, String photoID) throws InterruptedException {
             final List<NameValuePair> params = new ArrayList<NameValuePair>();
             final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";

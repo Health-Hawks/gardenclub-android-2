@@ -28,6 +28,7 @@ import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.request.FutureTarget;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -49,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,7 +65,7 @@ import static android.support.v7.widget.RecyclerView.*;
  */
 
 
-public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> implements Filterable {
+public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> implements Filterable, GlideModule {
     private List<Contacts> contacts;
     private List<Contacts> contactsFiltered;
     private Context context;
@@ -79,6 +81,16 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         this.context = context;
         this.contacts = contacts;
         this.contactsFiltered = contacts;
+    }
+
+    @Override
+    public String glideName() {
+        return null;
+    }
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+        return null;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -97,8 +109,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             this.tvName = (TextView) view.findViewById(R.id.nameTV);
             this.tvMbrStatus = (TextView) view.findViewById(R.id.tv_mbrstatus);
             this.mImageView = (ImageView) view.findViewById(R.id.imageView4);
-
-
         }
     }
 
@@ -138,32 +148,13 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
         Log.d(TAG, "onBindViewHolder: pID: " + pID);
 
-        if (pID != "null" && pID != null) {
-//                            Bitmap bmp = GetImage(uID, uEmail, pID);
-            ArrayList<String> arrayList = new ArrayList<>(3);
-            arrayList.add(uID);
-            arrayList.add(uEmail);
-            arrayList.add(pID);
-            Log.d(TAG, "onBindViewHolder: all good");
-
-//            final List<NameValuePair> bmpParams = new ArrayList<NameValuePair>();
-//            bmpParams.add(new BasicNameValuePair("userID", uID));
-//            bmpParams.add(new BasicNameValuePair("email", uEmail));
-//            bmpParams.add(new BasicNameValuePair("photoID", pID));
-            try {
-                bmp = new ImageGetter().execute(arrayList).get();
-                Log.d(TAG, "onBindViewHolder: all good? LOL???");
-                Glide.with(context)
-                        .load(bmp)
-                        .apply(RequestOptions.overrideOf(100, 100))
-                        .apply(RequestOptions.circleCropTransform())
-                        .into(holder.mImageView);
-                holder.mImageView.setImageBitmap(bmp);
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        if (pID != "null") {
+            Log.d(TAG, "onBindViewHolder: photoID: " + pID);
+            Glide.with(context)
+                    .load("http://capefeargardenclub.org/cfgcTestingJSON/images_Testing/images/" + pID + ".jpg")
+                    .apply(RequestOptions.overrideOf(100, 100))
+                    .into(holder.mImageView);
+//                holder.mImageView.setImageBitmap(bmp);
 
 
 //            try {
@@ -171,61 +162,23 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
 //            }
+        } else if (pID == null) {
+            Log.d(TAG, "onBindViewHolder: photoID is null");
+        } else {
+            Log.d(TAG, "onBindViewHolder: photoID is 'null'");
+            Glide.with(context)
+                    .load(R.drawable.carolinayellowjessaminemed1)
+                    .apply(RequestOptions.overrideOf(100, 100))
+                    .into(holder.mImageView);
         }
     }
 
-
-
-    public Bitmap GetImage(String uID, String email, String photoID) throws InterruptedException {
-        final List<NameValuePair> params = new ArrayList<NameValuePair>();
-        final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
-        params.add(new BasicNameValuePair("userID", uID));
-        params.add(new BasicNameValuePair("email", email));
-        params.add(new BasicNameValuePair("photoID", photoID));
-        final Bitmap[] bmp = new Bitmap[1];
-//            final String url = strUrl;
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                HttpGet httpRequest = null;
-
-                //////////////
-                HttpClient client = new DefaultHttpClient();
-                HttpPost httpPost = new HttpPost(url);
-                try {
-                    httpPost.setEntity(new UrlEncodedFormEntity(params));
-                    //problem starts here
-                    HttpResponse response = client.execute(httpPost);
-                    StatusLine statusLine = response.getStatusLine();
-                    int statusCode = statusLine.getStatusCode();
-                    if (statusCode == 200) { // Status OK
-                        HttpEntity entity = response.getEntity();
-                        BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
-                        InputStream instream = bufHttpEntity.getContent();
-                        bmp[0] = BitmapFactory.decodeStream(instream);
-                    } else {
-                        Log.e("Log", "Failed to download result..");
-                    }
-                } catch (ClientProtocolException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
-        thread.join();
-        Bitmap image = bmp[0];
-        return bmp[0];
-    }
-
-    public class ImageGetter extends AsyncTask<ArrayList<String>, Void, Bitmap> {
+    public class ImageGetter extends AsyncTask<ArrayList<String>, Void, InputStream> {
         @Override
-        protected Bitmap doInBackground(ArrayList<String>[] strings) {
+        protected InputStream doInBackground(ArrayList<String>[] strings) {
             Log.d(TAG, "doInBackground: strings: " + strings);
             final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
-            Bitmap bmp = null;
+            Bitmap innerBmp = null;
 //            final String url = strUrl;
             String uID = strings[0].get(0);
             Log.d(TAG, "doInBackground: uID: "+ uID);
@@ -235,6 +188,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             params.add(new BasicNameValuePair("userID", uID));
             params.add(new BasicNameValuePair("email", email));
             params.add(new BasicNameValuePair("photoID", photoID));
+            InputStream instream = null;
 
             //////////runnable = new runnable() { --->
             HttpGet httpRequest = null;
@@ -255,14 +209,17 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                     Log.d(TAG, "doInBackground: statuscode is ok");
                     HttpEntity entity = response.getEntity();
                     BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
-                    InputStream instream = bufHttpEntity.getContent();
-                    bmp = BitmapFactory.decodeStream(instream);
-//                    FutureTarget<Bitmap> futureTarget =
-//                            Glide.with(context)
-//                                    .asBitmap()
-//                                    .load(url)
-//                                    .submit(75, 75);
-//                    bmp = futureTarget.get();
+                    instream = bufHttpEntity.getContent();
+//                    bmp = BitmapFactory.decodeStream(instream);
+//                    Log.d(TAG, "doInBackground: before glide");
+//                    innerBmp = Glide.with(context)
+//                            .asBitmap()
+//                            .load(url)
+//                            .apply(RequestOptions.overrideOf(75, 75))
+//                            .submit().get();
+//                    ///////here and below doesn't run
+//                    Log.d(TAG, "doInBackground: after glide");
+//                    Log.d(TAG, "doInBackground: sasdasda");
                 } else {
                     Log.e(TAG, "doInBackground: status code not okay");
                     Log.e("Log", "Failed to download result..");
@@ -273,15 +230,88 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 e.printStackTrace();
             }
             Log.d(TAG, "doInBackground: ends");
-            return bmp;
+            return instream;
         }
 
         @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            bmp = bitmap;
-            Log.d(TAG, "onPostExecute: starts and ends lol");
+        protected void onPostExecute(InputStream inputStream) {
+            Log.d(TAG, "onPostExecute: ends: instream: " + inputStream);
         }
     }
+
+//    public class PerhapsRecieveImage extends AsyncTask<JSONArray, Void, Map<String, Bitmap>> {
+//        @Override
+//        protected Map<String, Bitmap> doInBackground(JSONArray... jsonArrays) {
+//            Log.d(TAG, "ImageGetter doInBackground: starts");
+//            final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
+//            JSONArray currentJA;
+//            JSONObject currentJO;
+//            InputStream inStream = null;
+//
+//            HttpClient client = new DefaultHttpClient();
+//            HttpPost httpPost = new HttpPost(url);
+//            for (int i = 0; i < jsonArrays[0].length(); i++) {
+//
+//
+//                Log.d(TAG, "doInBackground: i: " + i);
+//                try {
+//                    httpPost.setEntity(new UrlEncodedFormEntity(params));
+//                    HttpResponse response = client.execute(httpPost);
+//                    StatusLine statusLine = response.getStatusLine();//////
+//                    int statusCode = statusLine.getStatusCode();
+//                    Bitmap bmp = null;
+//                    if (statusCode == 200) { // Status OK
+//                            try {
+//                                inStream = null;
+//                                BufferedHttpEntity bufHttpEntity = null;
+//
+//                                currentJO = jsonArrays[0].getJSONObject(i);
+//                                String currentPIDJO = currentJO.getString("PhotoID");
+//                                String currentUIDJO = currentJO.getString("ID");
+////                                params.add(new BasicNameValuePair("photoID", currentPIDJO));
+//                                HttpEntity entity = response.getEntity();
+//                                bufHttpEntity = new BufferedHttpEntity(entity);
+//                                inStream = bufHttpEntity.getContent();
+//                                Log.d(TAG, "doInBackground: bmp: " + bmp);
+//                                Log.d(TAG, "doInBackground: currentUIDJO: " + currentUIDJO);
+//                                Log.d(TAG, "doInBackground: currentPIDJO: " + currentPIDJO);
+//                                BitmapFactory.Options options = new BitmapFactory.Options();
+//                                options.inJustDecodeBounds = true;
+//                                int imageHeight = options.outHeight;
+//                                int imageWidth = options.outWidth;
+//                                options.inSampleSize = 2;
+//                                Log.d(TAG, "doInBackground: imageHeight: " + imageHeight);
+//                                Log.d(TAG, "doInBackground: imageWidth: " + imageWidth);
+//                                bmp = BitmapFactory.decodeStream(inStream, null, options);
+////                                userPhotoArray.put(currentUIDJO, bmp);
+//
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+////                            inStream.close();
+//
+//                    } else {
+//                        Log.e("Log", "Failed to download result..");
+//                    }
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                } catch (ClientProtocolException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//            return userPhotoArray;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Map<String, Bitmap> stringBitmapMap) {
+//            Log.d(TAG, "onPostExecute: starts image");
+//        }
+//    }
+
+
 
     @Override
     public int getItemCount() {
