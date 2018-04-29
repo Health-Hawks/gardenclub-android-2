@@ -1,9 +1,13 @@
 package com.example.lenovo.gardenclub;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -19,8 +23,38 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
+import com.bumptech.glide.request.FutureTarget;
+import com.bumptech.glide.request.RequestOptions;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static android.support.v7.widget.RecyclerView.*;
 
@@ -28,15 +62,15 @@ import static android.support.v7.widget.RecyclerView.*;
  * Created by Joe on 3/19/2018.
  */
 
+
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> implements Filterable {
     private List<Contacts> contacts;
     private List<Contacts> contactsFiltered;
     private Context context;
     ValueFilter valueFilter;
-    int prevCnstrntLength;
-    int cnstrntLength;
     private static final String TAG = "ContactAdapter";
     String item;
+    Bitmap bmp;
 
     List list = new ArrayList();
     List fullList = new ArrayList();
@@ -54,6 +88,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         private TextView tvMbrStatus;
         private ImageView mImageView;
         private View parentView;
+        Map<String, Bitmap> bitmapMap;
+
 
         public ViewHolder(@NonNull View view) {
             super(view);
@@ -61,19 +97,16 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             this.tvName = (TextView) view.findViewById(R.id.nameTV);
             this.tvMbrStatus = (TextView) view.findViewById(R.id.tv_mbrstatus);
             this.mImageView = (ImageView) view.findViewById(R.id.imageView4);
+
+
         }
     }
+
+
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.row_layout, parent, false));
-//        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        row = layoutInflater.inflate(R.layout.row_layout_1, parent, false);
-//        contactHolder = new ContactHolder();
-//        contactHolder.tvName = row.findViewById(R.id.nameTV);
-//        contactHolder.tvMbrStatus = row.findViewById(R.id.tv_mbrstatus);
-//        contactHolder.mImageView = row.findViewById(R.id.imageView4);
-//        row.setTag(contactHolder);
     }
 
     @Override
@@ -81,7 +114,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         final Contacts contact = (Contacts) contactsFiltered.get(position);
         holder.tvName.setText(contact.getName());
         holder.tvMbrStatus.setText(contact.getMbrStatus());
-        //ONCLICKLISTENER<----------------------------------------------------
+        String uID = contact.getUserID();
+        String uEmail = contact.getEmail();
+        String pID = contact.getPhotoID();
         holder.parentView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,7 +135,152 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 ContactList.fa.finish();
             }
         });
-        
+
+        Log.d(TAG, "onBindViewHolder: pID: " + pID);
+
+        if (pID != "null" && pID != null) {
+//                            Bitmap bmp = GetImage(uID, uEmail, pID);
+            ArrayList<String> arrayList = new ArrayList<>(3);
+            arrayList.add(uID);
+            arrayList.add(uEmail);
+            arrayList.add(pID);
+            Log.d(TAG, "onBindViewHolder: all good");
+
+//            final List<NameValuePair> bmpParams = new ArrayList<NameValuePair>();
+//            bmpParams.add(new BasicNameValuePair("userID", uID));
+//            bmpParams.add(new BasicNameValuePair("email", uEmail));
+//            bmpParams.add(new BasicNameValuePair("photoID", pID));
+            try {
+                bmp = new ImageGetter().execute(arrayList).get();
+                Log.d(TAG, "onBindViewHolder: all good? LOL???");
+                Glide.with(context)
+                        .load(bmp)
+                        .apply(RequestOptions.overrideOf(100, 100))
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(holder.mImageView);
+                holder.mImageView.setImageBitmap(bmp);
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
+//            try {
+//                holder.mImageView.setImageBitmap(GetImage(uID, uEmail, pID));
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+        }
+    }
+
+
+
+    public Bitmap GetImage(String uID, String email, String photoID) throws InterruptedException {
+        final List<NameValuePair> params = new ArrayList<NameValuePair>();
+        final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
+        params.add(new BasicNameValuePair("userID", uID));
+        params.add(new BasicNameValuePair("email", email));
+        params.add(new BasicNameValuePair("photoID", photoID));
+        final Bitmap[] bmp = new Bitmap[1];
+//            final String url = strUrl;
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                HttpGet httpRequest = null;
+
+                //////////////
+                HttpClient client = new DefaultHttpClient();
+                HttpPost httpPost = new HttpPost(url);
+                try {
+                    httpPost.setEntity(new UrlEncodedFormEntity(params));
+                    //problem starts here
+                    HttpResponse response = client.execute(httpPost);
+                    StatusLine statusLine = response.getStatusLine();
+                    int statusCode = statusLine.getStatusCode();
+                    if (statusCode == 200) { // Status OK
+                        HttpEntity entity = response.getEntity();
+                        BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+                        InputStream instream = bufHttpEntity.getContent();
+                        bmp[0] = BitmapFactory.decodeStream(instream);
+                    } else {
+                        Log.e("Log", "Failed to download result..");
+                    }
+                } catch (ClientProtocolException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+        thread.join();
+        Bitmap image = bmp[0];
+        return bmp[0];
+    }
+
+    public class ImageGetter extends AsyncTask<ArrayList<String>, Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(ArrayList<String>[] strings) {
+            Log.d(TAG, "doInBackground: strings: " + strings);
+            final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
+            Bitmap bmp = null;
+//            final String url = strUrl;
+            String uID = strings[0].get(0);
+            Log.d(TAG, "doInBackground: uID: "+ uID);
+            String email = strings[0].get(1);
+            String photoID = strings[0].get(2);
+            final List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("userID", uID));
+            params.add(new BasicNameValuePair("email", email));
+            params.add(new BasicNameValuePair("photoID", photoID));
+
+            //////////runnable = new runnable() { --->
+            HttpGet httpRequest = null;
+
+            //////////////
+            Log.d(TAG, "doInBackground: all gucci");
+            HttpClient client = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost(url);
+            Log.d(TAG, "doInBackground: still fucci");
+            try {
+                Log.d(TAG, "doInBackground: try");
+                httpPost.setEntity(new UrlEncodedFormEntity(params));
+                //problem starts here
+                HttpResponse response = client.execute(httpPost);
+                StatusLine statusLine = response.getStatusLine();//////
+                int statusCode = statusLine.getStatusCode();
+                if (statusCode == 200) { // Status OK
+                    Log.d(TAG, "doInBackground: statuscode is ok");
+                    HttpEntity entity = response.getEntity();
+                    BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+                    InputStream instream = bufHttpEntity.getContent();
+                    bmp = BitmapFactory.decodeStream(instream);
+//                    FutureTarget<Bitmap> futureTarget =
+//                            Glide.with(context)
+//                                    .asBitmap()
+//                                    .load(url)
+//                                    .submit(75, 75);
+//                    bmp = futureTarget.get();
+                } else {
+                    Log.e(TAG, "doInBackground: status code not okay");
+                    Log.e("Log", "Failed to download result..");
+                }
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG, "doInBackground: ends");
+            return bmp;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            bmp = bitmap;
+            Log.d(TAG, "onPostExecute: starts and ends lol");
+        }
     }
 
     @Override
@@ -108,36 +288,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         return this.contactsFiltered.size();
     }
 
-
-    public AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            if (list != null) {
-                Contacts item = (Contacts) adapterView.getItemAtPosition(i);
-                String name = item.getName();
-                String uID = item.getUserID();
-                String loginEmail = item.getLoginEmail();
-                Intent intent = new Intent(adapterView.getContext(), Contact.class);
-                intent.putExtra("user_id", uID);
-                intent.putExtra("login_email", loginEmail);
-                adapterView.getContext().startActivity(intent);
-                ContactList.fa.finish();
-            }
-        }
-    };
-//
-//    public void add(Contacts object) {
-//        super.add(object);
-//        list.add(object);
-//        fullList = list;
-//
-//    }
-//
-//    @Override
-//    public int getItemCount() {
-//        return list.size();
-//    }
-//
     @Nullable
     public Object getItem(int position) {
         return list.get(position);
@@ -184,11 +334,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         }
         return valueFilter;
     }
-
-    /////////////////////////////////////////////
-    ///////////////////////////////////////////
-    //////////////////////////////////////////
-    //////////////////////////////////////
 
     private class ValueFilter extends Filter {
         @Override
@@ -263,6 +408,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
         }
     }
+
+
+
+
 
 
 }

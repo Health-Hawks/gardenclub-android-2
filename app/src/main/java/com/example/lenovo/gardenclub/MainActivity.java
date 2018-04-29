@@ -312,168 +312,164 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public class ImageGetter extends AsyncTask<JSONArray, Void, Map<String, Bitmap>> {
-        @Override
-        protected Map<String, Bitmap> doInBackground(JSONArray... jsonArrays) {
-            Log.d(TAG, "ImageGetter doInBackground: starts");
-            Map<String, Bitmap> userPhotoArray = new HashMap<String, Bitmap>();
-            final List<NameValuePair> params = new ArrayList<NameValuePair>();
-            final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
-            JSONArray currentJA;
-            JSONObject currentJO;
-            InputStream inStream = null;
-
-            HttpClient client = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost(url);
-            for (int i = 0; i < jsonArrays[0].length(); i++) {
-                Log.d(TAG, "doInBackground: i: " + i);
-                try {
-                    httpPost.setEntity(new UrlEncodedFormEntity(params));
-                    HttpResponse response = client.execute(httpPost);
-                    StatusLine statusLine = response.getStatusLine();//////
-                    int statusCode = statusLine.getStatusCode();
-                    Bitmap bmp = null;
-                    if (statusCode == 200) { // Status OK
-                            try {
-                                inStream = null;
-                                BufferedHttpEntity bufHttpEntity = null;
-
-                                currentJO = jsonArrays[0].getJSONObject(i);
-                                String currentPIDJO = currentJO.getString("PhotoID");
-                                String currentUIDJO = currentJO.getString("ID");
-                                params.add(new BasicNameValuePair("photoID", currentPIDJO));
-                                HttpEntity entity = response.getEntity();
-                                bufHttpEntity = new BufferedHttpEntity(entity);
-                                inStream = bufHttpEntity.getContent();
-                                Log.d(TAG, "doInBackground: bmp: " + bmp);
-                                Log.d(TAG, "doInBackground: currentUIDJO: " + currentUIDJO);
-                                Log.d(TAG, "doInBackground: currentPIDJO: " + currentPIDJO);
-                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                options.inJustDecodeBounds = true;
-                                int imageHeight = options.outHeight;
-                                int imageWidth = options.outWidth;
-                                options.inSampleSize = 2;
-                                Log.d(TAG, "doInBackground: imageHeight: " + imageHeight);
-                                Log.d(TAG, "doInBackground: imageWidth: " + imageWidth);
-                                bmp = BitmapFactory.decodeStream(inStream, null, options);
-                                userPhotoArray.put(currentUIDJO, bmp);
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-//                            inStream.close();
-
-                    } else {
-                        Log.e("Log", "Failed to download result..");
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (ClientProtocolException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-//            Thread thread = new Thread(runnable);
-//            thread.start();
-//            thread.join();
-            Log.d(TAG, "doInBackground: userPhotoArray: " + userPhotoArray);
-            return userPhotoArray;
-        }
-
-        @Override
-        protected void onPostExecute(Map<String, Bitmap> stringBitmapMap) {
-            Log.d(TAG, "onPostExecute: starts image");
-            Log.d(TAG, "onPostExecute: image json_string: " + json_string);
-            Log.d(TAG, "onPostExecute: image username: " + username);
-            Log.d(TAG, "onPostExecute: image password: " + password);
-        }
-    }
+//    public class ImageGetter extends AsyncTask<JSONArray, Void, Map<String, Bitmap>> {
+//        @Override
+//        protected Map<String, Bitmap> doInBackground(JSONArray... jsonArrays) {
+//            Log.d(TAG, "ImageGetter doInBackground: starts");
+//            Map<String, Bitmap> userPhotoArray = new HashMap<String, Bitmap>();
+//            final List<NameValuePair> params = new ArrayList<NameValuePair>();
+//            final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
+//            JSONArray currentJA;
+//            JSONObject currentJO;
+//            InputStream inStream = null;
+//
+//            HttpClient client = new DefaultHttpClient();
+//            HttpPost httpPost = new HttpPost(url);
+//            for (int i = 0; i < jsonArrays[0].length(); i++) {
+//                Log.d(TAG, "doInBackground: i: " + i);
+//                try {
+//                    httpPost.setEntity(new UrlEncodedFormEntity(params));
+//                    HttpResponse response = client.execute(httpPost);
+//                    StatusLine statusLine = response.getStatusLine();//////
+//                    int statusCode = statusLine.getStatusCode();
+//                    Bitmap bmp = null;
+//                    if (statusCode == 200) { // Status OK
+//                            try {
+//                                inStream = null;
+//                                BufferedHttpEntity bufHttpEntity = null;
+//
+//                                currentJO = jsonArrays[0].getJSONObject(i);
+//                                String currentPIDJO = currentJO.getString("PhotoID");
+//                                String currentUIDJO = currentJO.getString("ID");
+//                                params.add(new BasicNameValuePair("photoID", currentPIDJO));
+//                                HttpEntity entity = response.getEntity();
+//                                bufHttpEntity = new BufferedHttpEntity(entity);
+//                                inStream = bufHttpEntity.getContent();
+//                                Log.d(TAG, "doInBackground: bmp: " + bmp);
+//                                Log.d(TAG, "doInBackground: currentUIDJO: " + currentUIDJO);
+//                                Log.d(TAG, "doInBackground: currentPIDJO: " + currentPIDJO);
+//                                BitmapFactory.Options options = new BitmapFactory.Options();
+//                                options.inJustDecodeBounds = true;
+//                                int imageHeight = options.outHeight;
+//                                int imageWidth = options.outWidth;
+//                                options.inSampleSize = 2;
+//                                Log.d(TAG, "doInBackground: imageHeight: " + imageHeight);
+//                                Log.d(TAG, "doInBackground: imageWidth: " + imageWidth);
+//                                bmp = BitmapFactory.decodeStream(inStream, null, options);
+//                                userPhotoArray.put(currentUIDJO, bmp);
+//
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+////                            inStream.close();
+//
+//                    } else {
+//                        Log.e("Log", "Failed to download result..");
+//                    }
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                } catch (ClientProtocolException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//            return userPhotoArray;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Map<String, Bitmap> stringBitmapMap) {
+//            Log.d(TAG, "onPostExecute: starts image");
+//            Log.d(TAG, "onPostExecute: image json_string: " + json_string);
+//            Log.d(TAG, "onPostExecute: image username: " + username);
+//            Log.d(TAG, "onPostExecute: image password: " + password);
+//        }
+//    }
 
 
-    public Bitmap GetImage(String uID, String email, String photoID) throws InterruptedException {
-        final List<NameValuePair> params = new ArrayList<NameValuePair>();
-        final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
-        params.add(new BasicNameValuePair("userID", uID));
-        params.add(new BasicNameValuePair("email", email));
-        params.add(new BasicNameValuePair("photoID", photoID));
-        final Bitmap[] bmp = new Bitmap[1];
-//            final String url = strUrl;
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                HttpGet httpRequest = null;
+//    public Bitmap GetImage(String uID, String email, String photoID) throws InterruptedException {
+//        final List<NameValuePair> params = new ArrayList<NameValuePair>();
+//        final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
+//        params.add(new BasicNameValuePair("userID", uID));
+//        params.add(new BasicNameValuePair("email", email));
+//        params.add(new BasicNameValuePair("photoID", photoID));
+//        final Bitmap[] bmp = new Bitmap[1];
+////            final String url = strUrl;
+//        Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                HttpGet httpRequest = null;
+//
+//                //////////////
+//                HttpClient client = new DefaultHttpClient();
+//                HttpPost httpPost = new HttpPost(url);
+//                str = new StringBuilder();
+//                try {
+//                    httpPost.setEntity(new UrlEncodedFormEntity(params));
+//                    //problem starts here
+//                    HttpResponse response = client.execute(httpPost);
+//                    StatusLine statusLine = response.getStatusLine();
+//                    int statusCode = statusLine.getStatusCode();
+//                    if (statusCode == 200) { // Status OK
+//                        HttpEntity entity = response.getEntity();
+//                        BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+//                        InputStream instream = bufHttpEntity.getContent();
+//                        bmp[0] = BitmapFactory.decodeStream(instream);
+//                    } else {
+//                        Log.e("Log", "Failed to download result..");
+//                    }
+//                } catch (ClientProtocolException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
+//        Thread thread = new Thread(runnable);
+//        thread.start();
+//        thread.join();
+//        Bitmap image = bmp[0];
+//        return bmp[0];
+//    }
 
-                //////////////
-                HttpClient client = new DefaultHttpClient();
-                HttpPost httpPost = new HttpPost(url);
-                str = new StringBuilder();
-                try {
-                    httpPost.setEntity(new UrlEncodedFormEntity(params));
-                    //problem starts here
-                    HttpResponse response = client.execute(httpPost);
-                    StatusLine statusLine = response.getStatusLine();
-                    int statusCode = statusLine.getStatusCode();
-                    if (statusCode == 200) { // Status OK
-                        HttpEntity entity = response.getEntity();
-                        BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
-                        InputStream instream = bufHttpEntity.getContent();
-                        bmp[0] = BitmapFactory.decodeStream(instream);
-                    } else {
-                        Log.e("Log", "Failed to download result..");
-                    }
-                } catch (ClientProtocolException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
-        thread.join();
-        Bitmap image = bmp[0];
-        return bmp[0];
-    }
-
-    public String getHttpPost(String strUrl, final List<NameValuePair> params) throws InterruptedException {
-        final String url = strUrl;
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                HttpClient client = new DefaultHttpClient();
-                HttpPost httpPost = new HttpPost(url);
-                str = new StringBuilder();
-                try {
-                    httpPost.setEntity(new UrlEncodedFormEntity(params));
-                    HttpResponse response = client.execute(httpPost);
-                    StatusLine statusLine = response.getStatusLine();
-                    int statusCode = statusLine.getStatusCode();
-                    if (statusCode == 200) { // Status OK
-                        HttpEntity entity = response.getEntity();
-                        InputStream content = entity.getContent();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            str.append(line);
-                        }
-                    } else {
-                        Log.e("Log", "Failed to download result..");
-                    }
-                    Log.d(TAG, "run: str: " + str);
-                } catch (ClientProtocolException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        Thread thread = new Thread(runnable);
-        thread.start();
-        thread.join();
-        Log.d(TAG, "getHttpPost: str: " + str);
-        return str.toString();
-    }
+//    public String getHttpPost(String strUrl, final List<NameValuePair> params) throws InterruptedException {
+//        final String url = strUrl;
+//        Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                HttpClient client = new DefaultHttpClient();
+//                HttpPost httpPost = new HttpPost(url);
+//                str = new StringBuilder();
+//                try {
+//                    httpPost.setEntity(new UrlEncodedFormEntity(params));
+//                    HttpResponse response = client.execute(httpPost);
+//                    StatusLine statusLine = response.getStatusLine();
+//                    int statusCode = statusLine.getStatusCode();
+//                    if (statusCode == 200) { // Status OK
+//                        HttpEntity entity = response.getEntity();
+//                        InputStream content = entity.getContent();
+//                        BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+//                        String line;
+//                        while ((line = reader.readLine()) != null) {
+//                            str.append(line);
+//                        }
+//                    } else {
+//                        Log.e("Log", "Failed to download result..");
+//                    }
+//                    Log.d(TAG, "run: str: " + str);
+//                } catch (ClientProtocolException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
+//        Thread thread = new Thread(runnable);
+//        thread.start();
+//        thread.join();
+//        Log.d(TAG, "getHttpPost: str: " + str);
+//        return str.toString();
+//    }
 
 }

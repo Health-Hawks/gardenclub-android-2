@@ -14,6 +14,7 @@ public class Contacts {
         this.setMbrStatus(mbrStatus);
         this.setUserID(userID);
         this.setLoginEmail(loginEmail);
+        this.setPhotoID(photoID);
 
     }
 
