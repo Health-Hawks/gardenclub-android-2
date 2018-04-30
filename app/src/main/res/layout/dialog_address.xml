@@ -37,6 +37,9 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="4dp"
+        android:nextFocusRight="@+id/etCity"
+        android:nextFocusDown="@+id/etCity"
+        android:nextFocusForward="@+id/etCity"
         android:layout_marginBottom="4dp"/>
 
     <TextView
@@ -52,12 +55,19 @@
         android:textSize="16sp"/>
     <EditText
         android:id="@+id/etCity"
+        android:inputType="textEmailAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="2dp"
-        android:fontFamily="sans-serif"/>
+        android:fontFamily="sans-serif"
+        android:nextFocusUp="@+id/etStreet"
+        android:nextFocusLeft="@+id/etStreet"
+        android:nextFocusRight="@+id/etState"
+        android:nextFocusDown="@+id/etState"
+        android:nextFocusForward="@+id/etState"
+        />
 
     <TextView
         android:id="@+id/stateTitle"
@@ -72,11 +82,17 @@
         android:textSize="16sp"/>
     <EditText
         android:id="@+id/etState"
+        android:inputType="textEmailAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="2dp"
+        android:nextFocusUp="@+id/etCity"
+        android:nextFocusLeft="@+id/etCity"
+        android:nextFocusRight="@+id/etZip"
+        android:nextFocusDown="@+id/etZip"
+        android:nextFocusForward="@+id/etZip"
         android:fontFamily="sans-serif"/>
 
     <TextView
@@ -93,10 +109,13 @@
     <EditText
         android:id="@+id/etZip"
         android:layout_width="match_parent"
+        android:inputType="textEmailAddress"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="2dp"
+        android:nextFocusUp="@+id/etState"
+        android:nextFocusLeft="@+id/etState"
         android:fontFamily="sans-serif"/>
 
 </LinearLayout>

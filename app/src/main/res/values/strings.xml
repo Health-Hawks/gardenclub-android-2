@@ -7,7 +7,7 @@
     <string name="Description">Description Holder</string>
     <string name="Name">Name Holder</string>
     <string name="MemberStatus">Member Status</string>
-    <string name="SprouseName">Spouse Name</string>
+    <string name="SpouseName">Spouse Name</string>
     <string name="Address">Address</string>
     <string name="PrimaryContact">Primary Contact</string>
     <string name="SecondaryContact">Secondary Contact</string>
@@ -17,27 +17,6 @@
     <string name="search_hint">Search the directory</string>
 
     <string name="PlaceHolder">Place Holder</string>
-
-    <string name="PrefToTreat">
-
-        <item>Massage</item>
-        <item>Acupuncture</item>
-        <item>Guided-imagery exercise</item>
-        <item>Distraction</item>
-        <item>Back rubs</item>
-        <item>Vibration</item>
-        <item>Use of ice or heat</item>
-        <item>Dry mouth - rinse</item>
-        <item>Mucositis - magic mouthwash</item>
-        <item>Supplemental oxygen</item>
-        <item>Lotions/emollients for dry cracked and/or itchy skin</item>
-        <item>Music therapy</item>
-        <item>Healing touch</item>
-        <item>Meditation</item>
-        <item>Reiki therapy</item>
-        <item>Other:indicate</item>
-
-    </string>
     <string name="member_status">Member Status</string>
     <string name="more_info">More Info</string>
     <string name="back">Back</string>
@@ -46,5 +25,7 @@
     <string name="dyk">Did You Know?</string>
     <string name="edit">Edit</string>
     <string name="userNoBio">You don\'t have a bio yet. Tap here to add one</string>
+    <string name="error_save">Error: Information was not successfully saved</string>
+    <string name="succ_save">Information successfully saved</string>
 
 </resources>

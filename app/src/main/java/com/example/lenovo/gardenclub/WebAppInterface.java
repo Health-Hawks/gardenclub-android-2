@@ -18,18 +18,15 @@ class WebAppInterface {
     /** Instantiate the interface and set the context */
     WebAppInterface(Context c) {
         this.mContext = c;
-        Log.d(TAG, "WebAppInterface: called");
     }
 
     @JavascriptInterface
     public void sendData(String data) {
-        Log.d(TAG, "sendData: called");
         this.mData = data;
     }
 
     @JavascriptInterface
     public String processHTML(String formData) {
-        Log.d("TAG", "processHTML: called " + formData);
         loginInfo = formData;
         return formData;
     }

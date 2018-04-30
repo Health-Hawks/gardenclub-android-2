@@ -42,20 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-//from github/gardenclub-android>git add .
-//...github/gardenclub-android>git commit -m "add existing files
-//...github/gardenclub-android>git push origin master
-
-/**
- * User photo images <-----
- *
- * Primary contact number edit, then update that for the call and text button
- *
- * update database with edited information:
- * --> this may be done with a php file
- *
- */
-
 
 public class MainActivity extends AppCompatActivity {
     EditText UsernameEt, PasswordEt;
@@ -65,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     WebView mWebView;
     String password, username;
-    int jsonParsed = 0;
     Intent intent;
     int i = 0;
     StringBuilder str;
@@ -76,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mWebView = findViewById(R.id.webview);
         intent = new Intent(this, ContactList.class);
-//        getSupportActionBar().hide();
         submit = findViewById(R.id.button);
         UsernameEt = findViewById(R.id.et_login);
         PasswordEt = findViewById(R.id.et_pass);
@@ -86,9 +70,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "Loading...", Toast.LENGTH_LONG).show();
-                username = UsernameEt.getText().toString();
+                username = UsernameEt.getText().toString().trim();
                 password = PasswordEt.getText().toString();
-//                mWebView.setVisibility(View.VISIBLE);
                 i++;
                 WebSettings webSettings = mWebView.getSettings();
                 webSettings.setJavaScriptEnabled(true);
@@ -108,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
                         if (viewURL != null) {
                             if (view.getUrl().equals("http://www.capefeargardenclub.org/wp-login.php?redirect_to=%2f")) {
                                 StringBuilder sb = new StringBuilder();
-//                sb.append("window.onload = function(){");
                                 sb.append("var objPWD = '" + password + "';objAccount  = '" + username + "';var str = '';");
                                 sb.append("var inputs = document.getElementsByTagName('input');");
                                 sb.append("for (var i = 0; i < inputs.length; i++) {");
@@ -120,13 +102,9 @@ public class MainActivity extends AppCompatActivity {
                                 sb.append("if (objPWD != null) { str += ' , ' + objPWD.value;}");
                                 sb.append("console.log('b');");
                                 sb.append("console.log('c');");
-//                    sb.append("window.Android.processHTML(str);");
                                 sb.append("console.log('d');");
                                 sb.append("document.getElementById('loginform').submit();");
-//                sb.append("return true;");
-//                sb.append("};");
                                 sb.append("console.log('e');");
-//                sb.append("login();");
                                 sb.append("console.log('f');");
                                 view.loadUrl("javascript:" + sb.toString());
                                 i++;
@@ -213,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             json_string = result;
             if (json_string != null) {
-                Log.d(TAG, "onPageFinished: json_string != null");
                 intent.putExtra("json_data", json_string);
                 intent.putExtra("login_email", username);
                 intent.putExtra("password", password);

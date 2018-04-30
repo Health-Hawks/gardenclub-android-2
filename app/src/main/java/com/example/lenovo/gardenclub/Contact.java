@@ -57,16 +57,13 @@ import java.util.List;
 public class Contact extends AppCompatActivity {
     int viewId_placeholder = 0;
     Button btnEmail, btnCall, btnText;
-    TextView emailID;
     static String json_string;
-    JSONObject jsonObject;
-    String json, JSON_STRING, type, userID;
+    String JSON_STRING, type, userID;
     private static final String TAG = "Contact";
     String finalEmail = null;
-    JSONObject JO;
     String SBString, loginEmail;
     StringBuilder str;
-    String udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec, password, bio;
+    String udFN, udLN, udSpouse, udAddress, udCAS, udZip, udPrim, udSec, password;
     TextView tvMoreInfo, tvBack;
     Intent backIntent;
 
@@ -90,23 +87,16 @@ public class Contact extends AppCompatActivity {
         new BackgroundTask1().execute("get_info", userID);
     }
 
-    public void getJSON(View view) {
-        new BackgroundTask1().execute();
-        parseJson(view);
-
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         backIntent.putExtra("login_email", loginEmail);
             startActivity(backIntent);
-
     }
 
 
     class BackgroundTask1 extends AsyncTask<String, Void, String> {
-        String json_post, json_get, json_url;
+        String json_url;
         private static final String TAG = "BackgroundTask";
 
 
@@ -141,22 +131,10 @@ public class Contact extends AppCompatActivity {
                     JSONObject jsonObject = new JSONObject(String.valueOf(stringBuilder));
                     JSONArray jsonArray = jsonObject.getJSONArray("server_response");
 
-                    Log.d(TAG, "Contact.java doInBackground: stringBuilder: " + stringBuilder);
-                    Log.d(TAG, "Contact.java doInBackground: jsonObject: " + String.valueOf(jsonObject));
                     backIntent.putExtra("json_data", String.valueOf(jsonObject));
-                    Log.d(TAG, "Contact.java doInBackground: jsonArray: " + jsonArray);
-
-                    String email;
-                    String mbrStatus;
-                    String photoID;
-                    String yearTurnedActive;
-                    String firstName;
-                    String lastName;
-                    String spouse;
-                    String StreetAddress;
-                    String city, state, WorkNum, Officers, CityState;
-                    String ZipCode, PrimaryContactNumber, SecondaryContactNumber;
-                    String BiographicalInfo;
+                    String email, mbrStatus, photoID, yearTurnedActive, firstName;
+                    String lastName, spouse, StreetAddress, city, state, CityState;
+                    String ZipCode, PrimaryContactNumber, SecondaryContactNumber, BiographicalInfo;
 
                     final TextView nameTV = (TextView) findViewById(R.id.nameTV);
                     final TextView mbrStatusTV = (TextView) findViewById(R.id.mbrStatusTV);
@@ -166,11 +144,8 @@ public class Contact extends AppCompatActivity {
                     final TextView secondaryContactTV = (TextView) findViewById(R.id.secondaryContactTV);
                     final TextView emailTV = (TextView) findViewById(R.id.emailTV);
                     final ImageView imageView = findViewById(R.id.imageView2);
-                    int isUser = 0;
 
                     for (int i = 0; i < jsonArray.length(); i++) {
-//                        Log.d(TAG, "doInBackground: jsonArray ->" + jsonArray.getJSONObject(i));
-
                         if (jsonArray.getJSONObject(i).getString("ID").equals(userID)) {
                             email = jsonArray.getJSONObject(i).getString("EmailAddress");
                             mbrStatus = jsonArray.getJSONObject(i).getString("Status");
@@ -189,9 +164,6 @@ public class Contact extends AppCompatActivity {
 
                             city = CityState.split(",")[0].trim();
                             state = CityState.split(",")[1].trim();
-                            Log.d(TAG, "doInBackground: city and state: " + CityState.split(","));
-                            Log.d(TAG, "doInBackground: city: " + city);
-                            Log.d(TAG, "doInBackground: state: " + state);
 
                             final String finalFirstName = firstName;
                             final String finalLastName = lastName;
@@ -223,13 +195,8 @@ public class Contact extends AppCompatActivity {
                                     primaryContactTV.setText(finalPrimaryContactNumber);
                                     secondaryContactTV.setText(finalSecondaryContactNumber);
                                     emailTV.setText(finalEmail);
-                                    int p_id = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                                     if (finalPhotoID != null && finalPhotoID != "null") {
-                                        //                                            Bitmap image = GetImage(userID, finalEmail, finalPhotoID);
-//                                            imageView.setImageBitmap(image);
                                         Glide.with(getApplicationContext())
                                                 .load("http://capefeargardenclub.org/cfgcTestingJSON/images_Testing/images/" + finalPhotoID + ".jpg")
                                                 .apply(RequestOptions.circleCropTransform())
@@ -397,7 +364,6 @@ public class Contact extends AppCompatActivity {
                                         View.OnClickListener editFields = new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
-                                                //need to indicate which alert dialog needs to be shown: firstName or LastName? City or State or Zip?
                                                 int viewId = view.getId();
 
                                                 if (viewId == nameTV.getId()) {
@@ -463,7 +429,6 @@ public class Contact extends AppCompatActivity {
                                                     finalGenAD.show();
                                                     etGen.setText(finalSpouse);
                                                     adTitle.setText("Edit Spouse Name");
-//                                                    etAlertDialog.setText(spouseTV.getText());
                                                 }
                                                 if (viewId == addressTV.getId()) {
                                                     viewId_placeholder = viewId;
@@ -506,13 +471,13 @@ public class Contact extends AppCompatActivity {
                                                                     if (udSec == null) {
                                                                         udSec = finalSecondaryContactNumber;
                                                                     }
-                                                                    if (finalState[0].length() > 2) {
-                                                                        Toast.makeText(getApplicationContext(), "Information was not saved: state must be two letters long", Toast.LENGTH_LONG).show();
+                                                                    if (finalState[0].length() != 2) {
+                                                                        Toast.makeText(getApplicationContext(), "Error: State must be entered as its two-letter abbreviation ", Toast.LENGTH_LONG).show();
                                                                         return;
                                                                     } else {
                                                                         try {
                                                                             if (udZip.length() != 5) {
-                                                                                Toast.makeText(getApplicationContext(), "Information was not saved: zip code must be a 5-digit number", Toast.LENGTH_LONG).show();
+                                                                                Toast.makeText(getApplicationContext(), "Error: Zip code must be a 5-digit number", Toast.LENGTH_LONG).show();
                                                                                 return;
                                                                             }
                                                                             int j = Integer.parseInt(udZip);
@@ -521,7 +486,7 @@ public class Contact extends AppCompatActivity {
                                                                         } catch (InterruptedException e) {
                                                                             e.printStackTrace();
                                                                         } catch (NumberFormatException e) {
-                                                                            Toast.makeText(getApplicationContext(), "Information was not saved: zip code must be a number", Toast.LENGTH_LONG).show();                                                                        }
+                                                                            Toast.makeText(getApplicationContext(), "Error: Zip code must be a number", Toast.LENGTH_LONG).show();                                                                        }
                                                                     }
                                                                 }})
                                                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -549,7 +514,6 @@ public class Contact extends AppCompatActivity {
                                                     viewId_placeholder = viewId;
                                                     Toast.makeText(getApplicationContext(), "You cannot edit your email address from this application", Toast.LENGTH_LONG).show();
                                                 }
-//                                            editText.setText(view.getId().get tvEdit.getText());/////<---------
                                             }
                                         };
 
@@ -589,13 +553,6 @@ public class Contact extends AppCompatActivity {
                                             Intent callIntent = new Intent(Intent.ACTION_CALL);
                                             callIntent.setData(Uri.parse("tel: " + finalPrimaryContactNumber));
                                             if (ActivityCompat.checkSelfPermission(Contact.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                                                // TODO: Consider calling
-                                                //    ActivityCompat#requestPermissions
-                                                // here to request the missing permissions, and then overriding
-                                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                                //                                          int[] grantResults)
-                                                // to handle the case where the user grants the permission. See the documentation
-                                                // for ActivityCompat#requestPermissions for more details.
                                                 Intent otherCallIntent = new Intent(Intent.ACTION_DIAL);
                                                 otherCallIntent.setData(Uri.parse("tel: " + finalPrimaryContactNumber));
                                                 startActivity(otherCallIntent);
@@ -629,9 +586,6 @@ public class Contact extends AppCompatActivity {
                                     });
                                 }
                             });
-                            Intent intent = new Intent(String.valueOf(this));
-//                            intent.putExtra("json_data", json_string);
-                            Log.d(TAG, "Contact.java doInBackground: json_string in oncreate: " + json_string);
                         }
                     }
                     bufferedReader.close();
@@ -685,61 +639,16 @@ public class Contact extends AppCompatActivity {
             // Prepare Save Data
             if(strStatusID.equals("0"))
             {
-//                ad.setMessage(strMessage);
-//                ad.show();
-                Toast.makeText(Contact.this, "Error: Information was not successfully saved", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Contact.this, R.string.error_save, Toast.LENGTH_SHORT).show();
                 return false;
             }
             else
             {
-                Toast.makeText(Contact.this, "Information successfully saved", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Contact.this, getApplicationContext().getString(R.string.succ_save), Toast.LENGTH_SHORT).show();
             }
             return true;
         }
 
-        public Bitmap GetImage(String uID, String email, String photoID) throws InterruptedException {
-            final List<NameValuePair> params = new ArrayList<NameValuePair>();
-            final String url = "http://capefeargardenclub.org/cfgcTestingJSON/getImage1.php";
-            params.add(new BasicNameValuePair("userID", uID));
-            params.add(new BasicNameValuePair("email", email));
-            params.add(new BasicNameValuePair("photoID", photoID));
-            final Bitmap[] bmp = new Bitmap[1];
-//            final String url = strUrl;
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    HttpGet httpRequest = null;
-
-                    //////////////
-                    HttpClient client = new DefaultHttpClient();
-                    HttpPost httpPost = new HttpPost(url);
-                    str = new StringBuilder();
-                    try {
-                        httpPost.setEntity(new UrlEncodedFormEntity(params));
-                        //problem starts here
-                        HttpResponse response = client.execute(httpPost);
-                        StatusLine statusLine = response.getStatusLine();//////
-                        int statusCode = statusLine.getStatusCode();
-                        if (statusCode == 200) { // Status OK
-                            HttpEntity entity = response.getEntity();
-                            BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
-                            InputStream instream = bufHttpEntity.getContent();
-                            bmp[0] = BitmapFactory.decodeStream(instream);
-                        } else {
-                            Log.e("Log", "Failed to download result..");
-                        }
-                    } catch (ClientProtocolException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            Thread thread = new Thread(runnable);
-            thread.start();
-            thread.join();
-            return bmp[0];
-        }
 
         public String getHttpPost(String strUrl, final List<NameValuePair> params, final String purpose) throws InterruptedException {
             final String url = strUrl;
@@ -753,7 +662,6 @@ public class Contact extends AppCompatActivity {
 
                         try {
                             httpPost.setEntity(new UrlEncodedFormEntity(params));
-                            //problem starts here
                             HttpResponse response = client.execute(httpPost);
                             StatusLine statusLine = response.getStatusLine();
                             int statusCode = statusLine.getStatusCode();
@@ -805,26 +713,9 @@ public class Contact extends AppCompatActivity {
             try {
                 jsonObject = new JSONObject(String.valueOf(SBString));
                 JSONArray jsonArray = jsonObject.getJSONArray("server_response");
-                String sssss = jsonObject.getString("userID");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    public void parseJson(View view) {
-        new BackgroundTask1().execute();
-        Log.d(TAG, "Contact.java parseJson: json_string: ");
-        if (json_string == null) {
-//            Toast.makeText(getApplicationContext(), "First Get JSON", Toast.LENGTH_LONG).show();
-
-        } else {
-//            backIntent.putExtra("json_data", json_string);
-            Intent intent = new Intent(this, ContactList.class);
-            intent.putExtra("json_data", json_string);
-            Log.d(TAG, "Contact.java parseJson: json_string" + json_string);
-
-            startActivity(intent);
         }
     }
 

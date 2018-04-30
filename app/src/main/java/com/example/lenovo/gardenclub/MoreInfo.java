@@ -45,7 +45,6 @@ public class MoreInfo extends AppCompatActivity {
         Intent intent = new Intent(this, MoreInfo.class);
         intent.getExtras();
         userID = getIntent().getExtras().getString("user_id");
-        Log.d(TAG, "onCreate: userID: " + userID);
         loginEmail = getIntent().getExtras().getString("login_email").trim();
         userEmail = getIntent().getExtras().getString("user_email").trim();
         firstName = getIntent().getExtras().getString("firstName").trim();
@@ -57,7 +56,6 @@ public class MoreInfo extends AppCompatActivity {
 
         String YTA = getIntent().getExtras().getString("YTA");
         bio = getIntent().getExtras().getString("bio");
-        Log.d(TAG, "MoreInfo onCreate: bio: " + bio);
 
 
         final TextView tvYTA = findViewById(R.id.tv_yta);
@@ -70,7 +68,7 @@ public class MoreInfo extends AppCompatActivity {
             if (bio != null || bio != "null") {
                 tvBio.setText(bio);
             } else {
-                tvBio.setText(R.string.userNoBio);
+                tvBio.setText(getApplicationContext().getString(R.string.userNoBio));
             }
             AlertDialog alertDialog = null;
             final AlertDialog.Builder builder;
@@ -142,7 +140,6 @@ public class MoreInfo extends AppCompatActivity {
         } else {
             if (bio.equals("null") || bio == null) {
                 tvBio.setText(firstName + " has not added a bio yet.");
-                Log.d(TAG, "onCreate: its " + bio.length());
             } else {
                 tvBio.setText(bio);
             }
@@ -158,19 +155,12 @@ public class MoreInfo extends AppCompatActivity {
 
     public boolean SaveData(String uID, String email, String bio) throws InterruptedException {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
-//            final TextView txtUserID = (TextView)findViewById(R.id.txtUserID);
-//            final TextView txtAppointmentID = (TextView)findViewById(R.id.txtAppointmentID);
-//            final EditText txtType = (EditText)findViewById(R.id.txtType);
-//            final EditText txtDate = (EditText)findViewById(R.id.txtDate);
-//            final EditText txtTime = (EditText)findViewById(R.id.txtTime);
-        //Dialog
 
         final AlertDialog.Builder ad = new AlertDialog.Builder(getApplicationContext());
 
         ad.setTitle("Error! ");
         ad.setIcon(android.R.drawable.btn_star_big_on);
         ad.setPositiveButton("Close", null);
-        Log.d(TAG, "SaveData: bio: " + bio);
 
         String url = "http://capefeargardenclub.org/cfgcTestingJSON/update.php";
         params.add(new BasicNameValuePair("userID", uID));
@@ -179,7 +169,6 @@ public class MoreInfo extends AppCompatActivity {
         params.add(new BasicNameValuePair("bioUpdate", "yes"));
 
         String resultServer  = getHttpPost(url,params);
-        Log.d(TAG, "resultServer - updateData: " + resultServer);
 
         /*** Default Value ***/
         String strStatusID = "0";
@@ -191,37 +180,31 @@ public class MoreInfo extends AppCompatActivity {
             strStatusID = c.getString("StatusID");
             strMessage = c.getString("Message");
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
         // Prepare Save Data
         if(strStatusID.equals("0")) {
-//                ad.setMessage(strMessage);
-//                ad.show();
-            Toast.makeText(MoreInfo.this, "Update not successful", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MoreInfo.this, getApplicationContext().getString(R.string.error_save), Toast.LENGTH_SHORT).show();
 
             return false;
         } else {
-            Toast.makeText(MoreInfo.this, "Update Data Successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MoreInfo.this, getApplicationContext().getString(R.string.succ_save), Toast.LENGTH_SHORT).show();
         }
         return true;
     }
 
     public String getHttpPost(String strUrl, final List<NameValuePair> params) throws InterruptedException {
-        Log.d(TAG, "getHttpPost: starts");
         final String url = strUrl;
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 HttpClient client = new DefaultHttpClient();
                 HttpPost httpPost = new HttpPost(url);
-                Log.d(TAG, "run: works");
                 str = new StringBuilder();
 
                 try {
                     httpPost.setEntity(new UrlEncodedFormEntity(params));
-                    //problem starts here
                     HttpResponse response = client.execute(httpPost);
                     StatusLine statusLine = response.getStatusLine();
                     int statusCode = statusLine.getStatusCode();
@@ -236,7 +219,6 @@ public class MoreInfo extends AppCompatActivity {
                     } else {
                         Log.e("Log", "Failed to download result..");
                     }
-                    Log.d(TAG, "run: str: " + str);
                 } catch (ClientProtocolException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -247,7 +229,6 @@ public class MoreInfo extends AppCompatActivity {
         Thread thread = new Thread(runnable);
         thread.start();
         thread.join();
-        Log.d(TAG, "getHttpPost: str: " + str);
         return str.toString();
     }
 
