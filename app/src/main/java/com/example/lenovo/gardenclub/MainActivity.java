@@ -64,8 +64,6 @@ public class MainActivity extends AppCompatActivity {
         submit = findViewById(R.id.button);
         UsernameEt = findViewById(R.id.et_login);
         PasswordEt = findViewById(R.id.et_pass);
-        UsernameEt.setText("bakere@uncw.edu");
-        PasswordEt.setText("6!4es2Nl#TCvF!yq)Wjn4#(k");
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
